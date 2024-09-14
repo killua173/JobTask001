@@ -58,7 +58,19 @@ print(summary)
 
 
 target = 'Renewable-electricity-generating-capacity-per-capita'
-features = data.columns.difference([target])
+features = [
+    'Entity',
+    'Energy intensity level of primary energy (MJ/$2017 PPP GDP)',
+    'Electricity from renewables (TWh)',
+    'Latitude',
+    'Primary energy consumption per capita (kWh/person)',
+    'Longitude',
+    'Access to clean fuels for cooking',
+    'Low-carbon electricity (% electricity)',
+    'Access to electricity (% of population)',
+    'gdp_per_capita',
+    'Year'
+]
 
 X = data[features]
 y = data[target]
@@ -95,29 +107,53 @@ print(f"Mean Absolute Error: {-mae_scores.mean():.4f} (+/- {mae_scores.std() * 2
 rf_model.fit(X_scaled, y)
 
 
-feature_importance = pd.DataFrame({'feature': X.columns, 'importance': rf_model.feature_importances_})
+""" feature_importance = pd.DataFrame({'feature': X.columns, 'importance': rf_model.feature_importances_})
 feature_importance = feature_importance.sort_values('importance', ascending=False)
-print("\nFeature Importance:")
-print(feature_importance)
+feature_importance['cumulative_importance'] = feature_importance['importance'].cumsum()# Separate country features from other features
+country_features = feature_importance[feature_importance['feature'].str.startswith('Entity_')]
+non_country_features = feature_importance[~feature_importance['feature'].str.startswith('Entity_')]
 
-importance_threshold = 0.01
-important_features_threshold = feature_importance[feature_importance['importance'] > importance_threshold]
-
-print("\nImportant features (Importance > 1%):")
-print(important_features_threshold)
+print("\nNon-country Feature Importance:")
+print(non_country_features)
 
 
-important_feature_names = important_features_threshold['feature'].tolist()
-
-print("\nList of important feature names:")
-print(important_feature_names)
-
-
-plt.figure(figsize=(10, 6))
-sns.barplot(x='importance', y='feature', data=feature_importance.head(15))
-plt.title('Top 15 Feature Importance')
+# Plot non-country feature importances
+plt.figure(figsize=(12, 6))
+sns.barplot(x='importance', y='feature', data=non_country_features.head(20))
+plt.title('Top 20 Non-Country Feature Importance')
 plt.tight_layout()
 plt.show()
+
+# Function to get features above a certain cumulative importance threshold
+def get_features_by_cumulative_importance(importance_df, cumulative_threshold):
+    return importance_df[importance_df['cumulative_importance'] <= cumulative_threshold]
+
+
+for threshold in [0.8, 0.9, 0.95]:
+    important_features = get_features_by_cumulative_importance(non_country_features, threshold)
+    print(f"\nNon-country features accounting for {threshold*100}% of cumulative importance:")
+    print(important_features)
+    print(f"Number of features: {len(important_features)}")
+
+
+mean_importance = non_country_features['importance'].mean()
+median_importance = non_country_features['importance'].median()
+print(f"\nMean non-country feature importance: {mean_importance:.4f}")
+print(f"Median non-country feature importance: {median_importance:.4f}")
+
+
+features_above_mean = non_country_features[non_country_features['importance'] > mean_importance]
+features_above_median = non_country_features[non_country_features['importance'] > median_importance]
+
+print(f"\nNon-country features above mean importance ({len(features_above_mean)}):")
+print(features_above_mean)
+
+print(f"\nNon-country features above median importance ({len(features_above_median)}):")
+print(features_above_mean)
+
+ """
+
+
 
 
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
@@ -162,3 +198,78 @@ plt.xlabel('Error')
 plt.ylabel('Frequency')
 plt.tight_layout()
 plt.show()
+
+
+
+
+
+""" 
+with all features
+
+Cross-validation results (5-fold):
+Mean Squared Error: 759.2454 (+/- 332.4475)
+R-squared Score: 0.9792 (+/- 0.0285)
+Mean Absolute Error: 6.7815 (+/- 1.0191)
+
+
+
+
+Final Model Performance on Test Set:
+Mean Squared Error: 919.7541
+R-squared Score: 0.9856
+Mean Absolute Error: 6.4835 
+
+"""
+
+
+""" 
+
+with 
+
+[
+    'Entity',
+    'Energy intensity level of primary energy (MJ/$2017 PPP GDP)',
+    'Electricity from renewables (TWh)',
+    'Latitude',
+    'Primary energy consumption per capita (kWh/person)',
+    'Longitude',
+    'Access to clean fuels for cooking',
+    'Low-carbon electricity (% electricity)',
+    'Access to electricity (% of population)',
+    'gdp_per_capita',
+    'Year'
+]
+
+
+Cross-validation results (5-fold):
+Mean Squared Error: 638.2200 (+/- 299.2900)
+R-squared Score: 0.9816 (+/- 0.0294)
+Mean Absolute Error: 6.3518 (+/- 0.6557)
+
+
+Final Model Performance on Test Set:
+Mean Squared Error: 742.5315
+R-squared Score: 0.9884
+Mean Absolute Error: 6.1554 """
+
+
+""" [
+    'Entity',
+    'Energy intensity level of primary energy (MJ/$2017 PPP GDP)',
+    'Electricity from renewables (TWh)',
+    'Latitude',
+    'Longitude',
+    'Primary energy consumption per capita (kWh/person)'
+]
+
+Cross-validation results (5-fold):
+Mean Squared Error: 875.3185 (+/- 379.9036)
+R-squared Score: 0.9755 (+/- 0.0353)
+Mean Absolute Error: 7.7040 (+/- 1.0261)
+
+Final Model Performance on Test Set:
+Mean Squared Error: 972.4729
+R-squared Score: 0.9848
+Mean Absolute Error: 7.1954
+
+ """
