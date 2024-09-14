@@ -1,10 +1,14 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split, KFold, cross_val_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error, make_scorer
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
+
 
 file_path = r'C:\Users\hamza\Downloads\archive (1)\global-data-on-sustainable-energy (1).csv'
 data = pd.read_csv(file_path)
@@ -13,10 +17,15 @@ missing_percentage = data.isnull().sum() / len(data) * 100
 print("Missing Percentage Before:")
 print(missing_percentage)
 print(data.dtypes)
+
 data[r'Density\n(P/Km2)'] = pd.to_numeric(data[r'Density\n(P/Km2)'], errors='coerce')
 
 columns_to_drop = missing_percentage[missing_percentage > 35].index
 data = data.drop(columns=columns_to_drop)
+print("Columns dropped due to more than 35% missing values:")
+print(columns_to_drop.tolist())
+
+
 
 for column in data.columns:
     if data[column].isnull().sum() > 0:
@@ -25,6 +34,18 @@ for column in data.columns:
         else:
             data[column].fillna(data[column].mean(), inplace=True)
 
+def remove_outliers(data):
+    columns = data.columns[2:]
+    for col in columns:
+        Q1 = data[col].quantile(0.25)
+        Q3 = data[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        data = data[(data[col] >= lower_bound) & (data[col] <= upper_bound)]
+    return data
+
+data_clean = remove_outliers(data)
 
 print("\nDataset Head:")
 print(data.head())
@@ -36,3 +57,108 @@ print("Summary of numerical data:")
 print(summary)
 
 
+target = 'Renewable-electricity-generating-capacity-per-capita'
+features = data.columns.difference([target])
+
+X = data[features]
+y = data[target]
+
+
+X = pd.get_dummies(X, columns=['Entity'])
+
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+
+rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+
+k_folds = 5
+
+kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+mse_scorer = make_scorer(mean_squared_error, greater_is_better=False)
+r2_scorer = make_scorer(r2_score, greater_is_better=True)
+mae_scorer = make_scorer(mean_absolute_error, greater_is_better=False)
+
+mse_scores = cross_val_score(rf_model, X_scaled, y, cv=kf, scoring=mse_scorer)
+r2_scores = cross_val_score(rf_model, X_scaled, y, cv=kf, scoring=r2_scorer)
+mae_scores = cross_val_score(rf_model, X_scaled, y, cv=kf, scoring=mae_scorer)
+
+
+print(f"\nCross-validation results ({k_folds}-fold):")
+print(f"Mean Squared Error: {-mse_scores.mean():.4f} (+/- {mse_scores.std() * 2:.4f})")
+print(f"R-squared Score: {r2_scores.mean():.4f} (+/- {r2_scores.std() * 2:.4f})")
+print(f"Mean Absolute Error: {-mae_scores.mean():.4f} (+/- {mae_scores.std() * 2:.4f})")
+
+
+rf_model.fit(X_scaled, y)
+
+
+feature_importance = pd.DataFrame({'feature': X.columns, 'importance': rf_model.feature_importances_})
+feature_importance = feature_importance.sort_values('importance', ascending=False)
+print("\nFeature Importance:")
+print(feature_importance)
+
+importance_threshold = 0.01
+important_features_threshold = feature_importance[feature_importance['importance'] > importance_threshold]
+
+print("\nImportant features (Importance > 1%):")
+print(important_features_threshold)
+
+
+important_feature_names = important_features_threshold['feature'].tolist()
+
+print("\nList of important feature names:")
+print(important_feature_names)
+
+
+plt.figure(figsize=(10, 6))
+sns.barplot(x='importance', y='feature', data=feature_importance.head(15))
+plt.title('Top 15 Feature Importance')
+plt.tight_layout()
+plt.show()
+
+
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+
+rf_model.fit(X_train, y_train)
+
+
+y_pred = rf_model.predict(X_test)
+
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+
+
+print("\nFinal Model Performance on Test Set:")
+print(f"Mean Squared Error: {mse:.4f}")
+print(f"R-squared Score: {r2:.4f}")
+print(f"Mean Absolute Error: {mae:.4f}")
+
+
+
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.title('Actual vs Predicted Values')
+plt.tight_layout()
+plt.show()
+
+
+errors = y_test - y_pred
+print("\nError Distribution:")
+print(errors.describe())
+
+plt.figure(figsize=(10, 6))
+sns.histplot(errors, kde=True)
+plt.title('Distribution of Errors')
+plt.xlabel('Error')
+plt.ylabel('Frequency')
+plt.tight_layout()
+plt.show()
