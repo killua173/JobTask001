@@ -10,13 +10,12 @@ class UploadMetadata(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     upload_date = Column(DateTime, default=datetime.utcnow)
-    mean_squared_error = Column(Float, nullable=True)
-    r_squared_score = Column(Float, nullable=True)
-    mean_absolute_error = Column(Float, nullable=True)
+    name = Column(String)
+
     
-    # Relationships
+
     data_records = relationship("DataRecord", back_populates="upload_metadata")
-    prediction_histories = relationship("PredictionHistory", back_populates="upload_metadata")
+    trained_models = relationship("TrainedModel", back_populates="upload_metadata")
 
 class DataRecord(Base):
     __tablename__ = 'data_records'
@@ -48,26 +47,36 @@ class DataRecord(Base):
     
     upload_metadata = relationship("UploadMetadata", back_populates="data_records")
 
+
+class TrainedModel(Base):
+    __tablename__ = 'trained_models'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    model_name = Column(String, nullable=False)  
+    mean_squared_error = Column(Float, nullable=True)
+    r_squared_score = Column(Float, nullable=True)
+    mean_absolute_error = Column(Float, nullable=True)
+    training_date = Column(DateTime, default=datetime.utcnow)
+    features = Column(String)  
+    target = Column(String)  
+    upload_metadata_id = Column(Integer, ForeignKey('upload_metadata.id'))
+    
+    upload_metadata = relationship("UploadMetadata", back_populates="trained_models")
+
+
+    prediction_history = relationship("PredictionHistory", back_populates="trained_models")
+
+
 class PredictionHistory(Base):
     __tablename__ = 'prediction_history'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     prediction_date = Column(DateTime, default=datetime.utcnow)
-    entity = Column(String)
-    energy_intensity = Column(Float)
-    electricity_from_renewables = Column(Float)
-    latitude = Column(Float)
-    primary_energy_consumption = Column(Float)
-    longitude = Column(Float)
-    access_to_clean_fuels = Column(Float)
-    low_carbon_electricity = Column(Float)
-    access_to_electricity = Column(Float)
-    gdp_per_capita = Column(Float)
-    year = Column(Integer)
-    
-    upload_metadata_id = Column(Integer, ForeignKey('upload_metadata.id'))
-    
-    upload_metadata = relationship("UploadMetadata", back_populates="prediction_histories")
+    input_data = Column(String)  
+    prediction = Column(Float)  
+    trained_model_id = Column(Integer, ForeignKey('trained_models.id'))  
+
+    trained_models = relationship("TrainedModel", back_populates="prediction_history")  
 
 # Create the engine and tables
 DATABASE_URL = 'postgresql://postgres:12@localhost:5432/TestDB'

@@ -182,12 +182,13 @@ async def process_data(id: int) -> pd.DataFrame:
 
 
 async def main():
-    df = await process_data(10)
+  
+    df = await process_data(1)
     print(f"DataFrame: {df}")
     
-    # Uncomment this when ready to use
-    # upload_id = await insert_data_and_get_upload_id(df)
-    # print(f"Upload ID: {upload_id}")
+
+""" upload_id = await insert_data_and_get_upload_id(data)
+  print(f"Upload ID: {upload_id}") """
 
 
 if __name__ == "__main__":
