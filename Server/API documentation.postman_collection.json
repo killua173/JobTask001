@@ -1,0 +1,625 @@
+{
+	"info": {
+		"_postman_id": "f5d66236-bc54-44fa-98e8-bcba1cdf3eb5",
+		"name": "API documentation",
+		"description": "# 📄 Get started here\n\nThis template contains a boilerplate for documentation that you can quickly customize and reuse.\n\n## 🔖 How to use this template\n\n- Replace the content given brackets (()) with your API's details.\n    \n- Tips are formatted in `codespan` - feel free to read and remove them.\n    \n\n---\n\n`Start with a brief overview of what your API offers.`\n\nThe ((product name)) provides many API products, tools, and resources that enable you to ((add product value here)).\n\n`You can also list the APIs you offer, link to the relevant pages, or do both in this section.`\n\n## **Getting started guide**\n\n`List the steps or points required to start using your APIs. Make sure to cover everything required to reach success with your API as quickly as possible.`\n\nTo start using the ((add APIs here)), you need to -\n\n`The points given below are from The Postman API's documentation. You can reference it to write your own getting started guide.`\n\n- You must use a valid API Key to send requests to the API endpoints. You can get your API key from Postman's [integrations dashboard](https://go.postman.co/settings/me/api-keys).\n    \n- The API has [rate and usage limits](https://learning.postman.com/docs/developer/postman-api/postman-api-rate-limits/).\n    \n- The API only responds to HTTPS-secured communications. Any requests sent via HTTP return an HTTP 301 redirect to the corresponding HTTPS resources.\n    \n- The API returns request responses in JSON format. When an API request returns an error, it is sent in the JSON response as an error key.\n    \n\n## Authentication\n\n`Add details on the authorization keys/tokens required, steps that cover how to get them, and the relevant error codes.`\n\nThe ((product name)) API uses ((add your API's authorization type)) for authentication.\n\n`The details given below are from the Postman API's documentation. You can reference it to write your own authentication section.`\n\nPostman uses API keys for authentication. You can generate a Postman API key in the [API keys](https://postman.postman.co/settings/me/api-keys) section of your Postman account settings.\n\nYou must include an API key in each request to the Postman API with the X-Api-Key request header.\n\n### Authentication error response\n\nIf an API key is missing, malformed, or invalid, you will receive an HTTP 401 Unauthorized response code.\n\n## Rate and usage limits\n\n`Use this section to cover your APIs' terms of use. Include API limits, constraints, and relevant error codes, so consumers understand the permitted API usage and practices.`\n\n`The example given below is from The Postman API's documentation. Use it as a reference to write your APIs' terms of use.`\n\nAPI access rate limits apply at a per-API key basis in unit time. The limit is 300 requests per minute. Also, depending on your plan, you may have usage limits. If you exceed either limit, your request will return an HTTP 429 Too Many Requests status code.\n\nEach API response returns the following set of headers to help you identify your use status:\n\n| Header | Description |\n| --- | --- |\n| `X-RateLimit-Limit` | The maximum number of requests that the consumer is permitted to make per minute. |\n| `X-RateLimit-Remaining` | The number of requests remaining in the current rate limit window. |\n| `X-RateLimit-Reset` | The time at which the current rate limit window resets in UTC epoch seconds. |\n\n### 503 response\n\nAn HTTP `503` response from our servers indicates there is an unexpected spike in API access traffic. The server is usually operational within the next five minutes. If the outage persists or you receive any other form of an HTTP `5XX` error, [contact support](https://support.postman.com/hc/en-us/requests/new/).\n\n### **Need some help?**\n\n`Add links that customers can refer to whenever they need help.`\n\nIn case you have questions, go through our tutorials ((link to your video or help documentation here)). Or visit our FAQ page ((link to the relevant page)).\n\nOr you can check out our community forum, there’s a good chance our community has an answer for you. Visit our developer forum ((link to developer forum)) to review topics, ask questions, and learn from others.\n\n`You can also document or add links to libraries, code examples, and other resources needed to make a request.`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38359441"
+	},
+	"item": [
+		{
+			"name": "ML",
+			"item": [
+				{
+					"name": "http://0.0.0.0:8000/predict?upload_id=1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"entity\": \"Afghanistan\",\r\n    \"year\": 2005,\r\n    \"energy_intensity\": 10,\r\n    \"electricity_from_renewables\": 12.0,\r\n    \"latitude\": 243,\r\n    \"primary_energy_consumption\": 83190,\r\n    \"longitude\": -24303,\r\n    \"access_to_clean_fuels\": 300.0,\r\n    \"low_carbon_electricity\": 43200.0,\r\n    \"access_to_electricity\": 10302.0,\r\n    \"gdp_per_capita\": 39012\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/predict?upload_id=1",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"predict"
+							],
+							"query": [
+								{
+									"key": "upload_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://0.0.0.0:8000/predict?upload_id=1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"entity\": \"Afghanistan\",\r\n    \"year\": 2005,\r\n    \"energy_intensity\": 10,\r\n    \"electricity_from_renewables\": 12.0,\r\n    \"latitude\": 243,\r\n    \"primary_energy_consumption\": 83190,\r\n    \"longitude\": -24303,\r\n    \"access_to_clean_fuels\": 300.0,\r\n    \"low_carbon_electricity\": 43200.0,\r\n    \"access_to_electricity\": 10302.0,\r\n    \"gdp_per_capita\": 39012\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/predict?upload_id=1",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"predict"
+									],
+									"query": [
+										{
+											"key": "upload_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:35:25 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "31"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"prediction\": 778.533000000001\n}"
+						}
+					]
+				},
+				{
+					"name": "http://localhost:8000/upload-data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/hamza/Downloads/archive (1)/global-data-on-sustainable-energy (1).csv"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8000/upload-data",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"upload-data"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://localhost:8000/upload-data",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/hamza/Downloads/archive (1)/global-data-on-sustainable-energy (1).csv"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8000/upload-data",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"upload-data"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:34:40 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "54"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Data uploaded successfully\",\n    \"upload_id\": 4\n}"
+						}
+					]
+				},
+				{
+					"name": "http://0.0.0.0:8000/get-data?country=Afghanistan",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/get-data?country=Afghanistan",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"get-data"
+							],
+							"query": [
+								{
+									"key": "country",
+									"value": "Afghanistan"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://0.0.0.0:8000/get-data?country=Afghanistan",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/get-data?country=Afghanistan",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"get-data"
+									],
+									"query": [
+										{
+											"key": "country",
+											"value": "Afghanistan"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:34:16 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-disposition",
+									"value": "attachment; filename=data.csv"
+								},
+								{
+									"key": "content-type",
+									"value": "text/csv; charset=utf-8"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked"
+								}
+							],
+							"cookie": [],
+							"body": "id,year,entity,access_to_electricity,access_to_clean_fuels,renewable_capacity,financial_flows,renewable_energy_share,electricity_from_fossil_fuels,electricity_from_nuclear,electricity_from_renewables,low_carbon_electricity,primary_energy_consumption,energy_intensity,co2_emissions,renewables_percentage,gdp_growth,gdp_per_capita,density,land_area,latitude,longitude\r\n1,2000,Afghanistan,1.613591,6.2,9.22,20000.0,44.99,0.16,0.0,0.31,65.95744,302.59482,1.64,760.0,,,,60.0,652230.0,33.93911,67.709953\r\n2,2001,Afghanistan,4.074574,7.2,8.86,130000.0,45.6,0.09,0.0,0.5,84.745766,236.89185,1.74,730.0,,,,60.0,652230.0,33.93911,67.709953\r\n3,2002,Afghanistan,9.409158,8.2,8.47,3950000.0,37.83,0.13,0.0,0.56,81.159424,210.86215,1.4,1029.999971,,,179.4265792,60.0,652230.0,33.93911,67.709953\r\n4,2003,Afghanistan,14.738506,9.5,8.09,25970000.0,36.66,0.31,0.0,0.63,67.02128,229.96822,1.4,1220.000029,,8.832277813,190.6838143,60.0,652230.0,33.93911,67.709953\r\n5,2004,Afghanistan,20.064968,10.9,7.75,,44.24,0.33,0.0,0.56,62.92135,204.23125,1.2,1029.999971,,1.414117981,211.3820742,60.0,652230.0,33.93911,67.709953\r\n6,2005,Afghanistan,25.390894,12.2,7.51,9830000.0,33.88,0.34,0.0,0.59,63.440857,252.06912,1.41,1549.999952,,11.22971482,242.0313132,60.0,652230.0,33.93911,67.709953\r\n7,2006,Afghanistan,30.71869,13.85,7.4,10620000.0,31.89,0.2,0.0,0.64,76.190475,304.4209,1.5,1759.99999,,5.357403251,263.7336019,60.0,652230.0,33.93911,67.709953\r\n8,2007,Afghanistan,36.05101,15.3,7.25,15750000.0,28.78,0.2,0.0,0.75,78.94737,354.2799,1.53,1769.999981,,13.82631955,359.6931579,60.0,652230.0,33.93911,67.709953\r\n9,2008,Afghanistan,42.4,16.7,7.49,16170000.0,21.17,0.19,0.0,0.54,73.9726,607.8335,1.94,3559.999943,,3.924983822,364.663542,60.0,652230.0,33.93911,67.709953\r\n10,2009,Afghanistan,46.74005,18.4,7.5,9960000.0,16.53,0.16,0.0,0.78,82.97872,975.04816,2.25,4880.000114,,21.39052839,437.2687402,60.0,652230.0,33.93911,67.709953\r\n11,2010,Afghanistan,42.7,20.0,8.27,36500000.0,15.15,0.19,0.0,0.75,79.78723,1182.892,2.46,7110.000134,,14.36244147,543.3065262,60.0,652230.0,33.93911,67.709953\r\n12,2011,Afghanistan,43.22202,21.8,8.13,28690000.0,12.61,0.18,0.0,0.6,76.92309,1436.1143,3.23,8930.000305,,0.426354785,591.1900302,60.0,652230.0,33.93911,67.709953\r\n13,2012,Afghanistan,69.1,23.0,9.29,62630000.0,15.36,0.14,0.0,0.74,84.09091,1324.1211,2.61,8079.999924,,12.75228709,638.8458516,60.0,652230.0,33.93911,67.709953\r\n14,2013,Afghanistan,68.29065,24.8,9.1,268460000.0,16.86,0.22,0.0,0.89,80.180176,1060.7926,2.46,5989.999771,,5.600744658,624.3154545,60.0,652230.0,33.93911,67.709953\r\n15,2014,Afghanistan,89.5,26.1,8.95,6940000.0,18.93,0.16,0.0,1.0,86.2069,868.5762,2.25,4880.000114,,2.724543364,614.2233424,60.0,652230.0,33.93911,67.709953\r\n16,2015,Afghanistan,71.5,27.4,8.79,4890000.0,17.53,0.15,0.0,1.03,87.28814,970.0803,2.37,5949.999809,,1.45131466,556.0072209,60.0,652230.0,33.93911,67.709953\r\n17,2016,Afghanistan,97.7,28.6,9.87,860000.0,19.92,0.15,0.0,1.06,87.603294,862.79114,2.24,5300.000191,,2.260314201,512.0127781,60.0,652230.0,33.93911,67.709953\r\n18,2017,Afghanistan,97.7,29.7,9.79,50330000.0,19.21,0.18,0.0,1.09,85.826775,829.31195,2.3,4780.00021,,2.647003202,516.6798622,60.0,652230.0,33.93911,67.709953\r\n19,2018,Afghanistan,96.616135,30.9,9.55,70100000.0,17.96,0.2,0.0,0.97,82.90598,924.25085,2.44,6070.000172,,1.189228128,485.6684187,60.0,652230.0,33.93911,67.709953\r\n20,2019,Afghanistan,97.7,31.9,9.58,4620000.0,18.51,0.18,0.0,0.89,83.17757,802.61255,2.41,6079.999924,,3.911603419,494.1793499,60.0,652230.0,33.93911,67.709953\r\n21,2020,Afghanistan,97.7,33.2,9.35,,,0.12,0.0,0.68,85.0,702.888,,,,-2.351100673,516.7478708,60.0,652230.0,33.93911,67.709953\r\n3650,2000,Afghanistan,1.613591,6.2,9.22,20000.0,44.99,0.16,0.0,0.31,65.95744,302.59482,1.64,760.0,,,,60.0,652230.0,33.93911,67.709953\r\n3651,2001,Afghanistan,4.074574,7.2,8.86,130000.0,45.6,0.09,0.0,0.5,84.745766,236.89185,1.74,730.0,,,,60.0,652230.0,33.93911,67.709953\r\n3652,2002,Afghanistan,9.409158,8.2,8.47,3950000.0,37.83,0.13,0.0,0.56,81.159424,210.86215,1.4,1029.999971,,,179.4265792,60.0,652230.0,33.93911,67.709953\r\n3653,2003,Afghanistan,14.738506,9.5,8.09,25970000.0,36.66,0.31,0.0,0.63,67.02128,229.96822,1.4,1220.000029,,8.832277813,190.6838143,60.0,652230.0,33.93911,67.709953\r\n3654,2004,Afghanistan,20.064968,10.9,7.75,,44.24,0.33,0.0,0.56,62.92135,204.23125,1.2,1029.999971,,1.414117981,211.3820742,60.0,652230.0,33.93911,67.709953\r\n3655,2005,Afghanistan,25.390894,12.2,7.51,9830000.0,33.88,0.34,0.0,0.59,63.440857,252.06912,1.41,1549.999952,,11.22971482,242.0313132,60.0,652230.0,33.93911,67.709953\r\n3656,2006,Afghanistan,30.71869,13.85,7.4,10620000.0,31.89,0.2,0.0,0.64,76.190475,304.4209,1.5,1759.99999,,5.357403251,263.7336019,60.0,652230.0,33.93911,67.709953\r\n3657,2007,Afghanistan,36.05101,15.3,7.25,15750000.0,28.78,0.2,0.0,0.75,78.94737,354.2799,1.53,1769.999981,,13.82631955,359.6931579,60.0,652230.0,33.93911,67.709953\r\n3658,2008,Afghanistan,42.4,16.7,7.49,16170000.0,21.17,0.19,0.0,0.54,73.9726,607.8335,1.94,3559.999943,,3.924983822,364.663542,60.0,652230.0,33.93911,67.709953\r\n3659,2009,Afghanistan,46.74005,18.4,7.5,9960000.0,16.53,0.16,0.0,0.78,82.97872,975.04816,2.25,4880.000114,,21.39052839,437.2687402,60.0,652230.0,33.93911,67.709953\r\n3660,2010,Afghanistan,42.7,20.0,8.27,36500000.0,15.15,0.19,0.0,0.75,79.78723,1182.892,2.46,7110.000134,,14.36244147,543.3065262,60.0,652230.0,33.93911,67.709953\r\n3661,2011,Afghanistan,43.22202,21.8,8.13,28690000.0,12.61,0.18,0.0,0.6,76.92309,1436.1143,3.23,8930.000305,,0.426354785,591.1900302,60.0,652230.0,33.93911,67.709953\r\n3662,2012,Afghanistan,69.1,23.0,9.29,62630000.0,15.36,0.14,0.0,0.74,84.09091,1324.1211,2.61,8079.999924,,12.75228709,638.8458516,60.0,652230.0,33.93911,67.709953\r\n3663,2013,Afghanistan,68.29065,24.8,9.1,268460000.0,16.86,0.22,0.0,0.89,80.180176,1060.7926,2.46,5989.999771,,5.600744658,624.3154545,60.0,652230.0,33.93911,67.709953\r\n3664,2014,Afghanistan,89.5,26.1,8.95,6940000.0,18.93,0.16,0.0,1.0,86.2069,868.5762,2.25,4880.000114,,2.724543364,614.2233424,60.0,652230.0,33.93911,67.709953\r\n3665,2015,Afghanistan,71.5,27.4,8.79,4890000.0,17.53,0.15,0.0,1.03,87.28814,970.0803,2.37,5949.999809,,1.45131466,556.0072209,60.0,652230.0,33.93911,67.709953\r\n3666,2016,Afghanistan,97.7,28.6,9.87,860000.0,19.92,0.15,0.0,1.06,87.603294,862.79114,2.24,5300.000191,,2.260314201,512.0127781,60.0,652230.0,33.93911,67.709953\r\n3667,2017,Afghanistan,97.7,29.7,9.79,50330000.0,19.21,0.18,0.0,1.09,85.826775,829.31195,2.3,4780.00021,,2.647003202,516.6798622,60.0,652230.0,33.93911,67.709953\r\n3668,2018,Afghanistan,96.616135,30.9,9.55,70100000.0,17.96,0.2,0.0,0.97,82.90598,924.25085,2.44,6070.000172,,1.189228128,485.6684187,60.0,652230.0,33.93911,67.709953\r\n3669,2019,Afghanistan,97.7,31.9,9.58,4620000.0,18.51,0.18,0.0,0.89,83.17757,802.61255,2.41,6079.999924,,3.911603419,494.1793499,60.0,652230.0,33.93911,67.709953\r\n3670,2020,Afghanistan,97.7,33.2,9.35,,,0.12,0.0,0.68,85.0,702.888,,,,-2.351100673,516.7478708,60.0,652230.0,33.93911,67.709953\r\n7299,2000,Afghanistan,1.613591,6.2,9.22,20000.0,44.99,0.16,0.0,0.31,65.95744,302.59482,1.64,760.0,,,,60.0,652230.0,33.93911,67.709953\r\n7300,2001,Afghanistan,4.074574,7.2,8.86,130000.0,45.6,0.09,0.0,0.5,84.745766,236.89185,1.74,730.0,,,,60.0,652230.0,33.93911,67.709953\r\n7301,2002,Afghanistan,9.409158,8.2,8.47,3950000.0,37.83,0.13,0.0,0.56,81.159424,210.86215,1.4,1029.999971,,,179.4265792,60.0,652230.0,33.93911,67.709953\r\n7302,2003,Afghanistan,14.738506,9.5,8.09,25970000.0,36.66,0.31,0.0,0.63,67.02128,229.96822,1.4,1220.000029,,8.832277813,190.6838143,60.0,652230.0,33.93911,67.709953\r\n7303,2004,Afghanistan,20.064968,10.9,7.75,,44.24,0.33,0.0,0.56,62.92135,204.23125,1.2,1029.999971,,1.414117981,211.3820742,60.0,652230.0,33.93911,67.709953\r\n7304,2005,Afghanistan,25.390894,12.2,7.51,9830000.0,33.88,0.34,0.0,0.59,63.440857,252.06912,1.41,1549.999952,,11.22971482,242.0313132,60.0,652230.0,33.93911,67.709953\r\n7305,2006,Afghanistan,30.71869,13.85,7.4,10620000.0,31.89,0.2,0.0,0.64,76.190475,304.4209,1.5,1759.99999,,5.357403251,263.7336019,60.0,652230.0,33.93911,67.709953\r\n7306,2007,Afghanistan,36.05101,15.3,7.25,15750000.0,28.78,0.2,0.0,0.75,78.94737,354.2799,1.53,1769.999981,,13.82631955,359.6931579,60.0,652230.0,33.93911,67.709953\r\n7307,2008,Afghanistan,42.4,16.7,7.49,16170000.0,21.17,0.19,0.0,0.54,73.9726,607.8335,1.94,3559.999943,,3.924983822,364.663542,60.0,652230.0,33.93911,67.709953\r\n7308,2009,Afghanistan,46.74005,18.4,7.5,9960000.0,16.53,0.16,0.0,0.78,82.97872,975.04816,2.25,4880.000114,,21.39052839,437.2687402,60.0,652230.0,33.93911,67.709953\r\n7309,2010,Afghanistan,42.7,20.0,8.27,36500000.0,15.15,0.19,0.0,0.75,79.78723,1182.892,2.46,7110.000134,,14.36244147,543.3065262,60.0,652230.0,33.93911,67.709953\r\n7310,2011,Afghanistan,43.22202,21.8,8.13,28690000.0,12.61,0.18,0.0,0.6,76.92309,1436.1143,3.23,8930.000305,,0.426354785,591.1900302,60.0,652230.0,33.93911,67.709953\r\n7311,2012,Afghanistan,69.1,23.0,9.29,62630000.0,15.36,0.14,0.0,0.74,84.09091,1324.1211,2.61,8079.999924,,12.75228709,638.8458516,60.0,652230.0,33.93911,67.709953\r\n7312,2013,Afghanistan,68.29065,24.8,9.1,268460000.0,16.86,0.22,0.0,0.89,80.180176,1060.7926,2.46,5989.999771,,5.600744658,624.3154545,60.0,652230.0,33.93911,67.709953\r\n7313,2014,Afghanistan,89.5,26.1,8.95,6940000.0,18.93,0.16,0.0,1.0,86.2069,868.5762,2.25,4880.000114,,2.724543364,614.2233424,60.0,652230.0,33.93911,67.709953\r\n7314,2015,Afghanistan,71.5,27.4,8.79,4890000.0,17.53,0.15,0.0,1.03,87.28814,970.0803,2.37,5949.999809,,1.45131466,556.0072209,60.0,652230.0,33.93911,67.709953\r\n7315,2016,Afghanistan,97.7,28.6,9.87,860000.0,19.92,0.15,0.0,1.06,87.603294,862.79114,2.24,5300.000191,,2.260314201,512.0127781,60.0,652230.0,33.93911,67.709953\r\n7316,2017,Afghanistan,97.7,29.7,9.79,50330000.0,19.21,0.18,0.0,1.09,85.826775,829.31195,2.3,4780.00021,,2.647003202,516.6798622,60.0,652230.0,33.93911,67.709953\r\n7317,2018,Afghanistan,96.616135,30.9,9.55,70100000.0,17.96,0.2,0.0,0.97,82.90598,924.25085,2.44,6070.000172,,1.189228128,485.6684187,60.0,652230.0,33.93911,67.709953\r\n7318,2019,Afghanistan,97.7,31.9,9.58,4620000.0,18.51,0.18,0.0,0.89,83.17757,802.61255,2.41,6079.999924,,3.911603419,494.1793499,60.0,652230.0,33.93911,67.709953\r\n7319,2020,Afghanistan,97.7,33.2,9.35,,,0.12,0.0,0.68,85.0,702.888,,,,-2.351100673,516.7478708,60.0,652230.0,33.93911,67.709953\r\n"
+						}
+					]
+				},
+				{
+					"name": "http://0.0.0.0:8000/train-model?upload_id=1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/train-model?upload_id=2",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"train-model"
+							],
+							"query": [
+								{
+									"key": "upload_id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://0.0.0.0:8000/train-model?upload_id=1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/train-model?upload_id=2",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"train-model"
+									],
+									"query": [
+										{
+											"key": "upload_id",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:30:27 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "40"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Model trained successfully\"\n}"
+						},
+						{
+							"name": "http://0.0.0.0:8000/train-model?upload_id=1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/train-model?upload_id=3",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"train-model"
+									],
+									"query": [
+										{
+											"key": "upload_id",
+											"value": "3"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:30:14 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "54"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Model already trained for this upload_id\"\n}"
+						},
+						{
+							"name": "http://0.0.0.0:8000/train-model?upload_id=1",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/train-model?upload_id=5",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"train-model"
+									],
+									"query": [
+										{
+											"key": "upload_id",
+											"value": "5"
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:33:55 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "50"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"detail\": \"No data found for the given upload_id\"\n}"
+						}
+					]
+				},
+				{
+					"name": "http://0.0.0.0:8000/models",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/models",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"models"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://0.0.0.0:8000/models",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/models",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"models"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:36:23 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "1501"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"mean_squared_error\": 1367.3728969730887,\n        \"id\": 13,\n        \"mean_absolute_error\": 8.4476787671233,\n        \"features\": \"[\\\"entity\\\", \\\"energy_intensity\\\", \\\"electricity_from_renewables\\\", \\\"latitude\\\", \\\"primary_energy_consumption\\\", \\\"longitude\\\", \\\"access_to_clean_fuels\\\", \\\"low_carbon_electricity\\\", \\\"access_to_electricity\\\", \\\"gdp_per_capita\\\", \\\"year\\\"]\",\n        \"upload_metadata_id\": 1,\n        \"model_name\": \"Model_1\",\n        \"r_squared_score\": 0.9786070407566423,\n        \"training_date\": \"2024-09-15T19:27:45.700472\",\n        \"target\": \"renewable_capacity\"\n    },\n    {\n        \"mean_squared_error\": 1367.3728969730887,\n        \"id\": 15,\n        \"mean_absolute_error\": 8.4476787671233,\n        \"features\": \"[\\\"entity\\\", \\\"energy_intensity\\\", \\\"electricity_from_renewables\\\", \\\"latitude\\\", \\\"primary_energy_consumption\\\", \\\"longitude\\\", \\\"access_to_clean_fuels\\\", \\\"low_carbon_electricity\\\", \\\"access_to_electricity\\\", \\\"gdp_per_capita\\\", \\\"year\\\"]\",\n        \"upload_metadata_id\": 3,\n        \"model_name\": \"Model_3\",\n        \"r_squared_score\": 0.9786070407566423,\n        \"training_date\": \"2024-09-15T20:27:42.744877\",\n        \"target\": \"renewable_capacity\"\n    },\n    {\n        \"mean_squared_error\": 1367.3728969730887,\n        \"id\": 16,\n        \"mean_absolute_error\": 8.4476787671233,\n        \"features\": \"[\\\"entity\\\", \\\"energy_intensity\\\", \\\"electricity_from_renewables\\\", \\\"latitude\\\", \\\"primary_energy_consumption\\\", \\\"longitude\\\", \\\"access_to_clean_fuels\\\", \\\"low_carbon_electricity\\\", \\\"access_to_electricity\\\", \\\"gdp_per_capita\\\", \\\"year\\\"]\",\n        \"upload_metadata_id\": 2,\n        \"model_name\": \"Model_2\",\n        \"r_squared_score\": 0.9786070407566423,\n        \"training_date\": \"2024-09-15T20:30:45.073318\",\n        \"target\": \"renewable_capacity\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "http://localhost:8000/predictions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/predictions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"predictions"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "http://localhost:8000/predictions",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/predictions",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"predictions"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "date",
+									"value": "Sun, 15 Sep 2024 20:37:44 GMT"
+								},
+								{
+									"key": "server",
+									"value": "uvicorn"
+								},
+								{
+									"key": "content-length",
+									"value": "5509"
+								},
+								{
+									"key": "content-type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"prediction_date\": \"2024-09-15T20:35:26.282666\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 243.0, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 39012.0}\",\n        \"prediction\": 778.533000000001,\n        \"id\": 13,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T20:16:38.665815\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 243.0, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 39012.0}\",\n        \"prediction\": 778.533000000001,\n        \"id\": 12,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:47.318398\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 243.0, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 39012.0}\",\n        \"prediction\": 778.533000000001,\n        \"id\": 11,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:39.834244\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 3.0, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 39012.0}\",\n        \"prediction\": 901.060000000001,\n        \"id\": 10,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:31.868176\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 39012.0}\",\n        \"prediction\": 901.060000000001,\n        \"id\": 9,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:24.337171\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 10302.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 969.724000000001,\n        \"id\": 8,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:16.420737\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 969.724000000001,\n        \"id\": 7,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:29:09.390920\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 10.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300000.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 969.724000000001,\n        \"id\": 6,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:28:59.691561\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 12.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300000.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 952.9551000000008,\n        \"id\": 5,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:28:52.281644\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 2.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -24303.0, \\\"access_to_clean_fuels\\\": 300000.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 983.7483000000004,\n        \"id\": 4,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:28:43.998005\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 2.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -203.0, \\\"access_to_clean_fuels\\\": 300000.0, \\\"low_carbon_electricity\\\": 43200.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 983.7483000000004,\n        \"id\": 3,\n        \"trained_model_id\": 13\n    },\n    {\n        \"prediction_date\": \"2024-09-15T19:28:35.429528\",\n        \"input_data\": \"{\\\"entity\\\": \\\"Afghanistan\\\", \\\"year\\\": 2005, \\\"energy_intensity\\\": 2.0, \\\"electricity_from_renewables\\\": 12.0, \\\"latitude\\\": 2.0902, \\\"primary_energy_consumption\\\": 83190.0, \\\"longitude\\\": -203.0, \\\"access_to_clean_fuels\\\": 300000.0, \\\"low_carbon_electricity\\\": 400.0, \\\"access_to_electricity\\\": 1002.0, \\\"gdp_per_capita\\\": 390.0}\",\n        \"prediction\": 983.7483000000004,\n        \"id\": 2,\n        \"trained_model_id\": 13\n    }\n]"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "key",
+				"value": "X-API-Key",
+				"type": "string"
+			},
+			{
+				"key": "value",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://farming-simulator.pstmn.io"
+		}
+	]
+}

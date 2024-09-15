@@ -349,8 +349,43 @@ async def get_data_endpoint(country: str, db: AsyncSession = Depends(get_db)):
     
     if not records:
         raise HTTPException(status_code=404, detail=f"No data found for country: {country}")
-    
-    return jsonable_encoder(records)
+
+    # Convert records to a DataFrame
+    df = pd.DataFrame([{
+        "id": record.id,
+        "year": record.year,
+        "entity": record.entity,
+        "access_to_electricity": record.access_to_electricity,
+        "access_to_clean_fuels": record.access_to_clean_fuels,
+        "renewable_capacity": record.renewable_capacity,
+        "financial_flows": record.financial_flows,
+        "renewable_energy_share": record.renewable_energy_share,
+        "electricity_from_fossil_fuels": record.electricity_from_fossil_fuels,
+        "electricity_from_nuclear": record.electricity_from_nuclear,
+        "electricity_from_renewables": record.electricity_from_renewables,
+        "low_carbon_electricity": record.low_carbon_electricity,
+        "primary_energy_consumption": record.primary_energy_consumption,
+        "energy_intensity": record.energy_intensity,
+        "co2_emissions": record.co2_emissions,
+        "renewables_percentage": record.renewables_percentage,
+        "gdp_growth": record.gdp_growth,
+        "gdp_per_capita": record.gdp_per_capita,
+        "density": record.density,
+        "land_area": record.land_area,
+        "latitude": record.latitude,
+        "longitude": record.longitude
+    } for record in records])
+
+    # Convert DataFrame to CSV
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+    csv_buffer.seek(0)
+
+    return StreamingResponse(
+        csv_buffer,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=data.csv"}
+    )
 @app.get("/models")
 async def get_models(db: AsyncSession = Depends(get_db)):
     stmt = select(TrainedModel)
