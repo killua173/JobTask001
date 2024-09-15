@@ -6,7 +6,7 @@ from typing import Optional
 from datetime import datetime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from DbModels import UploadMetadata, DataRecord ,TrainedModel
+from DbModels import UploadMetadata, DataRecord ,TrainedModel,PredictionHistory
 from sqlalchemy.future import select
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -14,6 +14,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import json
+from sklearn.preprocessing import LabelEncoder
 
 DATABASE_URL = 'postgresql+asyncpg://postgres:12@localhost:5432/TestDB'
 
@@ -188,13 +189,16 @@ async def process_data(id: int) -> pd.DataFrame:
 
 
 async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, target: str = 'renewable_capacity',model_name: str='Model') -> None:
-    X = df.drop(columns=[target])
+    X = df.drop(columns=[target, 'id'])
     y = df[target]
     lsfeatures= X.columns.tolist()
     stfeatures =json.dumps(lsfeatures)
 
     # Convert categorical variables to dummy variables
-    X = pd.get_dummies(X, columns=['entity'])
+    if 'entity' in stfeatures:
+      label_encoder = LabelEncoder()
+      X['Entity_Encoded'] = label_encoder.fit_transform(X['entity'])
+      X = X.drop(columns=['entity'])
 
     # Scale the feature variables
     scaler = StandardScaler()
@@ -284,16 +288,115 @@ async def train_model(id: int, model_name: str = 'Model', target: str = 'renewab
 
 
 
+async def predict(session: AsyncSession, upload_metadata_id: int, input_data: dict):
+    # Step 1: Get the model name by searching upload_metadata_id
+    stmt = select(TrainedModel).where(TrainedModel.upload_metadata_id == upload_metadata_id)
+    result = await session.execute(stmt)
+    trained_model = result.scalar_one_or_none()
+
+    if not trained_model:
+        raise ValueError(f"No trained model found for upload_metadata_id: {upload_metadata_id}")
+
+    model_name = trained_model.model_name
+
+    # Step 2: Load the model
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(script_dir, 'MLmodels', f'{model_name}.pkl')
+
+    if not os.path.exists(model_path):
+        raise FileNotFoundError(f"Model file not found: {model_path}")
+
+    with open(model_path, 'rb') as model_file:
+        model = pickle.load(model_file)
+
+    # Step 3: Prepare input data for prediction
+    features = json.loads(trained_model.features)
+    input_df = pd.DataFrame([input_data])
+
+    # Ensure all features are present in input_data
+    for feature in features:
+        if feature not in input_df.columns:
+            raise ValueError(f"Missing feature in input data: {feature}")
+
+
+
+
+    # Reorder columns to match the training data
+    input_df = input_df[features]
+    if 'entity' in features:
+          label_encoder = LabelEncoder()
+          input_df['Entity_Encoded'] = label_encoder.fit_transform(input_df['entity'])
+          input_df = input_df.drop(columns=['entity'])
+
+    # Scale the input data
+    scaler = StandardScaler()
+    input_scaled = scaler.fit_transform(input_df)
+
+    # Step 4: Make prediction
+    prediction = model.predict(input_scaled)[0]
+
+    # Step 5: Save the prediction to the database
+    new_prediction = PredictionHistory(
+        prediction_date=datetime.utcnow(),
+        input_data=json.dumps(input_data),
+        prediction=float(prediction),
+        trained_model_id=trained_model.id
+    )
+    session.add(new_prediction)
+    await session.commit()
+
+    return prediction
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 async def main():
-  
-   await train_model(1)
+#  await train_model(1)
     
+ 
 
- #  upload_id = await upload(data)
- #  print(f"Upload ID: {upload_id}")
+ 
+    engine = create_async_engine(DATABASE_URL)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
+    async with async_session() as session:
+        # Test input data
+        input_data = {
+            'entity': 'United States',
+            'year': 2022,
+            'energy_intensity': 5.2,
+            'electricity_from_renewables': 834.0,
+            'latitude': 37.0902,
+            'primary_energy_consumption': 75000,
+            'longitude': -95.7129,
+            'access_to_clean_fuels': 100.0,
+            'low_carbon_electricity': 40.0,
+            'access_to_electricity': 100.0,
+            'gdp_per_capita': 63000
+        }
+
+        try:
+            # Assuming the upload_metadata_id is 1. Replace with the correct id if different.
+            prediction = await predict(session, upload_metadata_id=1, input_data=input_data)
+            print(f"Prediction result: {prediction}")
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+    await engine.dispose()
 
 if __name__ == "__main__":
     asyncio.run(main())
