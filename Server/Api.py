@@ -172,6 +172,9 @@ async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, ta
     stfeatures = json.dumps(lsfeatures)
     script_dir = os.path.dirname(os.path.abspath(__file__))
     model_dir = os.path.join(script_dir, 'MLmodels')
+    
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
 
     if 'entity' in stfeatures:
         label_encoder = LabelEncoder()
@@ -206,8 +209,6 @@ async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, ta
 
 
 
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
 
     scaler_path = os.path.join(model_dir, f'{model_name}_{upload_metadata_id}_scaler.pkl')
     with open(scaler_path, 'wb') as scaler_file:
