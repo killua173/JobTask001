@@ -1,20 +1,26 @@
 import pandas as pd
+import os
+import pickle
 import asyncio
 from typing import Optional
 from datetime import datetime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from DbModels import UploadMetadata, DataRecord 
+from DbModels import UploadMetadata, DataRecord ,TrainedModel
 from sqlalchemy.future import select
 import numpy as np
-
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+import json
 
 DATABASE_URL = 'postgresql+asyncpg://postgres:12@localhost:5432/TestDB'
 
 file_path = r'C:\Users\hamza\Downloads\archive (1)\global-data-on-sustainable-energy (1).csv'
 data = pd.read_csv(file_path)
 
-async def insert_data_and_get_upload_id(df) -> Optional[int]:
+async def upload(df) -> Optional[int]:
     df[r'Density\n(P/Km2)'] = pd.to_numeric(df[r'Density\n(P/Km2)'], errors='coerce')
 
     engine = create_async_engine(DATABASE_URL)
@@ -181,15 +187,115 @@ async def process_data(id: int) -> pd.DataFrame:
     await engine.dispose()
 
 
+async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, target: str = 'renewable_capacity',model_name: str='Model') -> None:
+    X = df.drop(columns=[target])
+    y = df[target]
+    lsfeatures= X.columns.tolist()
+    stfeatures =json.dumps(lsfeatures)
+
+    # Convert categorical variables to dummy variables
+    X = pd.get_dummies(X, columns=['entity'])
+
+    # Scale the feature variables
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # Define the model
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+    # Fit the model
+    rf_model.fit(X_train, y_train)
+
+    # Predict on the test set
+    y_pred = rf_model.predict(X_test)
+
+    # Evaluate model performance
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+    mae = mean_absolute_error(y_test, y_pred)
+
+    print("\nFinal Model Performance on Test Set:")
+    print(f"Mean Squared Error: {mse:.4f}")
+    print(f"R-squared Score: {r2:.4f}")
+    print(f"Mean Absolute Error: {mae:.4f}")
+
+
+    rf_model.fit(X_scaled, y)
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_dir = os.path.join(script_dir, 'MLmodels')
+
+
+
+    # Ensure MLmodels directory exists
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    # Save the model
+    model_path = os.path.join(model_dir, f'{model_name}_{upload_metadata_id}.pkl')
+    print(f"Saving model to: {model_path}")  
+    with open(model_path, 'wb') as model_file:
+        pickle.dump(rf_model, model_file)
+
+
+    # Save the metrics to the database
+    engine = create_async_engine(DATABASE_URL)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+    async with async_session() as session:
+        async with session.begin():
+            evaluation = TrainedModel(
+                upload_metadata_id=upload_metadata_id,
+                model_name=f'{model_name}_{upload_metadata_id}',
+                mean_squared_error=mse,
+                r_squared_score=r2,
+                mean_absolute_error=mae,
+                training_date=datetime.utcnow(),
+                features=stfeatures,
+                target=target,
+            )
+            session.add(evaluation)
+            await session.commit()
+
+    await engine.dispose()
+
+
+async def train_model(id: int, model_name: str = 'Model', target: str = 'renewable_capacity') -> None:
+    # Initialize the database connection and session
+    engine = create_async_engine(DATABASE_URL)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    
+    async with async_session() as session:
+       
+       df = await process_data(1)
+       await train_and_evaluate_model(df, id, target, model_name)
+    
+    # Dispose the engine after use
+    await engine.dispose()
+
+
+
+
+
+
+
+
+
+
+
 async def main():
   
-    df = await process_data(1)
-    print(f"DataFrame: {df}")
+   await train_model(1)
     
 
-""" upload_id = await insert_data_and_get_upload_id(data)
-  print(f"Upload ID: {upload_id}") """
+ #  upload_id = await upload(data)
+ #  print(f"Upload ID: {upload_id}")
 
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+print("Current Working Directory:", os.getcwd())

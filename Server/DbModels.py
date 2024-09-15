@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
 Base = declarative_base()
@@ -11,8 +11,6 @@ class UploadMetadata(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     upload_date = Column(DateTime, default=datetime.utcnow)
     name = Column(String)
-
-    
 
     data_records = relationship("DataRecord", back_populates="upload_metadata")
     trained_models = relationship("TrainedModel", back_populates="upload_metadata")
@@ -47,12 +45,11 @@ class DataRecord(Base):
     
     upload_metadata = relationship("UploadMetadata", back_populates="data_records")
 
-
 class TrainedModel(Base):
     __tablename__ = 'trained_models'
     
     id = Column(Integer, primary_key=True, autoincrement=True)
-    model_name = Column(String, nullable=False)  
+    model_name = Column(String)  
     mean_squared_error = Column(Float, nullable=True)
     r_squared_score = Column(Float, nullable=True)
     mean_absolute_error = Column(Float, nullable=True)
@@ -60,12 +57,9 @@ class TrainedModel(Base):
     features = Column(String)  
     target = Column(String)  
     upload_metadata_id = Column(Integer, ForeignKey('upload_metadata.id'))
-    
+
     upload_metadata = relationship("UploadMetadata", back_populates="trained_models")
-
-
     prediction_history = relationship("PredictionHistory", back_populates="trained_models")
-
 
 class PredictionHistory(Base):
     __tablename__ = 'prediction_history'
@@ -76,16 +70,4 @@ class PredictionHistory(Base):
     prediction = Column(Float)  
     trained_model_id = Column(Integer, ForeignKey('trained_models.id'))  
 
-    trained_models = relationship("TrainedModel", back_populates="prediction_history")  
-
-# Create the engine and tables
-DATABASE_URL = 'postgresql://postgres:12@localhost:5432/TestDB'
-engine = create_engine(DATABASE_URL)
-
-Base.metadata.create_all(engine)
-
-# Create a session
-Session = sessionmaker(bind=engine)
-session = Session()
-
-print("Tables created successfully.")
+    trained_models = relationship("TrainedModel", back_populates="prediction_history")
