@@ -1,12 +1,10 @@
 import pandas as pd
 import os
 import pickle
-import asyncio
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-from DbModels import UploadMetadata, DataRecord ,TrainedModel,PredictionHistory
 from sqlalchemy.future import select
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -16,13 +14,40 @@ from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import json
 from sklearn.preprocessing import LabelEncoder
 from fastapi import FastAPI, HTTPException, UploadFile, File, Depends
+from pydantic import BaseModel
+import io
+from fastapi.responses import StreamingResponse
+from DbModels import UploadMetadata, DataRecord, TrainedModel, PredictionHistory
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, desc
+from fastapi.encoders import jsonable_encoder
 
 DATABASE_URL = 'postgresql+asyncpg://postgres:12@localhost:5432/TestDB'
 
-file_path = r'C:\Users\hamza\Downloads\archive (1)\global-data-on-sustainable-energy (1).csv'
-data = pd.read_csv(file_path)
+app = FastAPI()
 
-async def upload(df) -> Optional[int]:
+# Database session dependency
+async def get_db():
+    engine = create_async_engine(DATABASE_URL)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with async_session() as session:
+        yield session
+    await engine.dispose()
+
+class PredictionInput(BaseModel):
+    entity: str
+    year: int
+    energy_intensity: float
+    electricity_from_renewables: float
+    latitude: float
+    primary_energy_consumption: float
+    longitude: float
+    access_to_clean_fuels: float
+    low_carbon_electricity: float
+    access_to_electricity: float
+    gdp_per_capita: float
+
+async def upload(df: pd.DataFrame) -> Optional[int]:
     df[r'Density\n(P/Km2)'] = pd.to_numeric(df[r'Density\n(P/Km2)'], errors='coerce')
 
     engine = create_async_engine(DATABASE_URL)
@@ -31,17 +56,11 @@ async def upload(df) -> Optional[int]:
     async with async_session() as session:
         async with session.begin():
             try:
-                # 1. Insert into upload_metadata
-                new_upload = UploadMetadata(
-                    upload_date=datetime.utcnow()
-                )
+                new_upload = UploadMetadata(upload_date=datetime.utcnow())
                 session.add(new_upload)
-                await session.flush()  
-
-            
+                await session.flush()
                 upload_id = new_upload.id
 
-                
                 for _, row in df.iterrows():
                     new_record = DataRecord(
                         entity=row['Entity'],
@@ -74,31 +93,15 @@ async def upload(df) -> Optional[int]:
                 return upload_id
 
             except Exception as e:
-                
                 print(f"An error occurred: {str(e)}")
                 return None
 
     await engine.dispose()
 
-
-
-
-
-
 async def clean_data(data: pd.DataFrame, missing_threshold: float = 35, outlier_threshold: float = 3) -> pd.DataFrame:
-
-    # Print initial missing percentage and data types
     missing_percentage = data.isnull().sum() / len(data) * 100
-    print("Missing Percentage Before:")
-    print(missing_percentage)
-
-
-    # Drop columns with more than the specified percentage of missing values
     columns_to_drop = missing_percentage[missing_percentage > missing_threshold].index
     data = data.drop(columns=columns_to_drop)
-    print(f"\nColumns dropped due to more than {missing_threshold}% missing values:")
-    print(columns_to_drop.tolist())
-
 
     for column in data.columns:
         if data[column].isnull().sum() > 0:
@@ -106,28 +109,6 @@ async def clean_data(data: pd.DataFrame, missing_threshold: float = 35, outlier_
                 data[column].fillna(data[column].median(), inplace=True)
             else:
                 data[column].fillna(data[column].mean(), inplace=True)
-
- 
-    """ def remove_outliers(df):
-        columns = df.select_dtypes(include=[np.number]).columns
-        for col in columns:
-            Q1 = df[col].quantile(0.25)
-            Q3 = df[col].quantile(0.75)
-            IQR = Q3 - Q1
-            lower_bound = Q1 - outlier_threshold * IQR
-            upper_bound = Q3 + outlier_threshold * IQR
-            df = df[(df[col] >= lower_bound) & (df[col] <= upper_bound)]
-            print(f"Column: {col}")
-            print(f"Lower Bound: {lower_bound}")
-            print(f"Upper Bound: {upper_bound}\n")
-            
-        return df
-
-    data_clean = remove_outliers(data) """
-
-    print("\nNull Values Sum:")
-    print(data.isnull().sum())
-
 
     return data
 
@@ -145,7 +126,6 @@ async def retrieve_data(session: AsyncSession, id: int) -> pd.DataFrame:
         print(f"No DataRecords found for upload_metadata_id: {id}")
         return pd.DataFrame()
 
-    # Convert to DataFrame for easier handling
     df = pd.DataFrame([
         {
             'id': r.id,
@@ -166,7 +146,6 @@ async def retrieve_data(session: AsyncSession, id: int) -> pd.DataFrame:
 
     return df
 
-
 async def process_data(id: int) -> pd.DataFrame:
     engine = create_async_engine(DATABASE_URL)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -181,43 +160,39 @@ async def process_data(id: int) -> pd.DataFrame:
         if df.empty:
             return pd.DataFrame()  
 
-        # Clean the data
         cleaned_df = await clean_data(df)  
         return cleaned_df
-    
 
     await engine.dispose()
 
-
-async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, target: str = 'renewable_capacity',model_name: str='Model') -> None:
+async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, target: str = 'renewable_capacity', model_name: str='Model') -> None:
     X = df.drop(columns=[target, 'id'])
     y = df[target]
-    lsfeatures= X.columns.tolist()
-    stfeatures =json.dumps(lsfeatures)
+    lsfeatures = X.columns.tolist()
+    stfeatures = json.dumps(lsfeatures)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_dir = os.path.join(script_dir, 'MLmodels')
 
-    # Convert categorical variables to dummy variables
     if 'entity' in stfeatures:
-      label_encoder = LabelEncoder()
-      X['Entity_Encoded'] = label_encoder.fit_transform(X['entity'])
-      X = X.drop(columns=['entity'])
+        label_encoder = LabelEncoder()
+        X['Entity_Encoded'] = label_encoder.fit_transform(X['entity'])
+        X = X.drop(columns=['entity'])
+        encoder_path = os.path.join(model_dir, f'{model_name}_{upload_metadata_id}_encoder.pkl')
+        with open(encoder_path, 'wb') as encoder_file:
+             pickle.dump(label_encoder, encoder_file)
 
-    # Scale the feature variables
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
+    
 
-    # Define the model
     rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
 
-    # Split data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-    # Fit the model
     rf_model.fit(X_train, y_train)
 
-    # Predict on the test set
     y_pred = rf_model.predict(X_test)
 
-    # Evaluate model performance
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
     mae = mean_absolute_error(y_test, y_pred)
@@ -226,27 +201,23 @@ async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, ta
     print(f"Mean Squared Error: {mse:.4f}")
     print(f"R-squared Score: {r2:.4f}")
     print(f"Mean Absolute Error: {mae:.4f}")
-
-
     rf_model.fit(X_scaled, y)
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    model_dir = os.path.join(script_dir, 'MLmodels')
 
 
 
-    # Ensure MLmodels directory exists
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
 
-    # Save the model
+    scaler_path = os.path.join(model_dir, f'{model_name}_{upload_metadata_id}_scaler.pkl')
+    with open(scaler_path, 'wb') as scaler_file:
+        pickle.dump(scaler, scaler_file)
+
     model_path = os.path.join(model_dir, f'{model_name}_{upload_metadata_id}.pkl')
     print(f"Saving model to: {model_path}")  
     with open(model_path, 'wb') as model_file:
         pickle.dump(rf_model, model_file)
 
-
-    # Save the metrics to the database
     engine = create_async_engine(DATABASE_URL)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
@@ -268,29 +239,21 @@ async def train_and_evaluate_model(df: pd.DataFrame, upload_metadata_id: int, ta
     await engine.dispose()
 
 
-async def train_model(id: int, model_name: str = 'Model', target: str = 'renewable_capacity') -> None:
-    # Initialize the database connection and session
+
+async def check_existing_model(upload_id: int) -> bool:
     engine = create_async_engine(DATABASE_URL)
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    
+
     async with async_session() as session:
-       
-       df = await process_data(1)
-       await train_and_evaluate_model(df, id, target, model_name)
-    
-    # Dispose the engine after use
+        stmt = select(TrainedModel).where(TrainedModel.upload_metadata_id == upload_id)
+        result = await session.execute(stmt)
+        existing_model = result.scalar_one_or_none()
+
     await engine.dispose()
-
-
-
-
-
-
-
+    return existing_model is not None
 
 
 async def predict(session: AsyncSession, upload_metadata_id: int, input_data: dict):
-    # Step 1: Get the model name by searching upload_metadata_id
     stmt = select(TrainedModel).where(TrainedModel.upload_metadata_id == upload_metadata_id)
     result = await session.execute(stmt)
     trained_model = result.scalar_one_or_none()
@@ -300,7 +263,6 @@ async def predict(session: AsyncSession, upload_metadata_id: int, input_data: di
 
     model_name = trained_model.model_name
 
-    # Step 2: Load the model
     script_dir = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(script_dir, 'MLmodels', f'{model_name}.pkl')
 
@@ -310,33 +272,30 @@ async def predict(session: AsyncSession, upload_metadata_id: int, input_data: di
     with open(model_path, 'rb') as model_file:
         model = pickle.load(model_file)
 
-    # Step 3: Prepare input data for prediction
     features = json.loads(trained_model.features)
     input_df = pd.DataFrame([input_data])
 
-    # Ensure all features are present in input_data
     for feature in features:
         if feature not in input_df.columns:
             raise ValueError(f"Missing feature in input data: {feature}")
 
-
-
-
-    # Reorder columns to match the training data
     input_df = input_df[features]
+
+
     if 'entity' in features:
-          label_encoder = LabelEncoder()
-          input_df['Entity_Encoded'] = label_encoder.fit_transform(input_df['entity'])
-          input_df = input_df.drop(columns=['entity'])
+        encoder_path = os.path.join(script_dir, 'MLmodels', f'{model_name}_encoder.pkl')
+        with open(encoder_path, 'rb') as encoder_file:
+             label_encoder = pickle.load(encoder_file)
+        input_df['Entity_Encoded'] = label_encoder.transform(input_df['entity'])
+        input_df = input_df.drop(columns=['entity'])
 
-    # Scale the input data
-    scaler = StandardScaler()
-    input_scaled = scaler.fit_transform(input_df)
+    scaler_path = os.path.join(script_dir, 'MLmodels', f'{model_name}_scaler.pkl')
+    with open(scaler_path, 'rb') as scaler_file:
+     scaler = pickle.load(scaler_file)
+    input_scaled = scaler.transform(input_df)
 
-    # Step 4: Make prediction
     prediction = model.predict(input_scaled)[0]
 
-    # Step 5: Save the prediction to the database
     new_prediction = PredictionHistory(
         prediction_date=datetime.utcnow(),
         input_data=json.dumps(input_data),
@@ -348,58 +307,75 @@ async def predict(session: AsyncSession, upload_metadata_id: int, input_data: di
 
     return prediction
 
+@app.post("/upload-data")
+async def upload_data_endpoint(file: UploadFile = File(...)):
+    contents = await file.read()
+    df = pd.read_csv(io.StringIO(contents.decode('utf-8')))
+    upload_id = await upload(df)
+    if upload_id is None:
+        raise HTTPException(status_code=500, detail="Failed to upload data")
+    return {"message": "Data uploaded successfully", "upload_id": upload_id}
 
+@app.post("/train-model")
+async def train_model_endpoint(upload_id: int, model_name: str = "Model", target: str = "renewable_capacity"):
+    # Check if a model already exists for this upload_id
+    model_exists = await check_existing_model(upload_id)
+    if model_exists:
+        return {"message": "Model already trained for this upload_id"}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-async def main():
-#  await train_model(1)
+    df = await process_data(upload_id)
+    if df.empty:
+        raise HTTPException(status_code=404, detail="No data found for the given upload_id")
     
- 
+    await train_and_evaluate_model(df, upload_id, target, model_name)
+    return {"message": "Model trained successfully"}
 
- 
-    engine = create_async_engine(DATABASE_URL)
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+@app.post("/predict")
+async def predict_endpoint(upload_id: int, input_data: PredictionInput, db: AsyncSession = Depends(get_db)):
+    try:
+        prediction = await predict(db, upload_id, input_data.dict())
+        return {"prediction": prediction}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except FileNotFoundError as fe:
+        raise HTTPException(status_code=404, detail=str(fe))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/get-data")
+async def get_data_endpoint(country: str, db: AsyncSession = Depends(get_db)):
+    stmt = select(DataRecord).where(DataRecord.entity == country)
+    result = await db.execute(stmt)
+    records = result.scalars().all()
+    
+    if not records:
+        raise HTTPException(status_code=404, detail=f"No data found for country: {country}")
+    
+    return jsonable_encoder(records)
+@app.get("/models")
+async def get_models(db: AsyncSession = Depends(get_db)):
+    stmt = select(TrainedModel)
+    result = await db.execute(stmt)
+    models = result.scalars().all()
 
-    async with async_session() as session:
-        # Test input data
-        input_data = {
-            'entity': 'United States',
-            'year': 2022,
-            'energy_intensity': 5.2,
-            'electricity_from_renewables': 834.0,
-            'latitude': 37.0902,
-            'primary_energy_consumption': 75000,
-            'longitude': -95.7129,
-            'access_to_clean_fuels': 13.0,
-            'low_carbon_electricity': 40.0,
-            'access_to_electricity': 100.0,
-            'gdp_per_capita': 63000
-        }
+    if not models:
+        raise HTTPException(status_code=404, detail="No models found in the database")
 
-        try:
-            # Assuming the upload_metadata_id is 1. Replace with the correct id if different.
-            prediction = await predict(session, upload_metadata_id=1, input_data=input_data)
-            print(f"Prediction result: {prediction}")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
+    return jsonable_encoder(models)
 
-    await engine.dispose()
+@app.get("/predictions")
+async def get_predictions(db: AsyncSession = Depends(get_db)):
+    stmt = select(PredictionHistory).order_by(desc(PredictionHistory.prediction_date)).limit(25)
+    result = await db.execute(stmt)
+    predictions = result.scalars().all()
+
+    if not predictions:
+        raise HTTPException(status_code=404, detail="No predictions found in the database")
+
+    return jsonable_encoder(predictions)
+
+
+
 
 if __name__ == "__main__":
-    asyncio.run(main())
-
-print("Current Working Directory:", os.getcwd())
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
