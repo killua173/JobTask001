@@ -1,7 +1,7 @@
 # Energy Prediction Project
 
 This project aims to predict renewable energy capacity using machine learning techniques based on various global sustainable energy indicators.
-## Getting Started
+# Getting Started
 
 To get started with the project, follow these steps:
 
@@ -18,17 +18,27 @@ To get started with the project, follow these steps:
 
 3. Ensure you are using Python 3.8.0.
 
-4. After the dependencies are installed, create the necessary database tables by running:
+4. Update the database connection string in both `create_tables.py` and `api.py`:
+   - Open both `create_tables.py` and `api.py` files.
+   - In each file, locate the `DATABASE_URL` variable.
+   - Change it to match your database setup. For example:
+     ```python
+     DATABASE_URL = 'postgresql+asyncpg://your_username:your_password@your_host:your_port/your_database'
+     ```
+   - Make sure to replace `your_username`, `your_password`, `your_host`, `your_port`, and `your_database` with your actual database credentials and details.
+   - Ensure that the `DATABASE_URL` is identical in both files.
+
+5. After the dependencies are installed and the database strings are updated, create the necessary database tables by running:
    ```bash
    python create_tables.py
    ```
 
-5. Navigate to the `servers` directory and start the API server:
+6. Navigate to the `servers` directory and start the API server:
    ```bash
    python api.py
    ```
 
-6. The API endpoints should now be available and ready to use.
+7. The API endpoints should now be available and ready to use.
 
 Note: `MachineLearningTest` has been used to test machine learning models before implementing them into the API.
 
